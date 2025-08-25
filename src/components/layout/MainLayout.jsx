@@ -1,10 +1,19 @@
 import { Outlet, Link, useNavigate } from "react-router";
+import { HiMiniShoppingCart } from "react-icons/hi2";
+
+// Custom Hooks
 import useAuthStore from "../../contexts/authStore";
+import useCartStore from "../../contexts/cartStore";
+
+// Componnets
 import Button from "../ui/Button";
 
 const MainLayout = () => {
   const { token, logout } = useAuthStore();
+  const { items } = useCartStore();
   const navigate = useNavigate();
+
+  const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
   const handleLogout = () => {
     logout();
@@ -19,6 +28,19 @@ const MainLayout = () => {
             TokoKita
           </Link>
           <div className="flex items-center space-x-4">
+            {/* Keranjang */}
+            <Link
+              to="/cart"
+              className="relative text-gray-600 hover:text-blue-600"
+            >
+              <HiMiniShoppingCart size={24} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+
             {token ? (
               <>
                 <Link
