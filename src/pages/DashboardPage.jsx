@@ -1,10 +1,14 @@
+import OrderHistoryPage from "./OrderHistoryPage";
+
 const DashboardPage = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold">Halaman Dashboard Pengguna</h1>
-      <p className="mt-4">
-        Hanya Pengguna yang terdaftar dapat mengakses halaman ini
-      </p>
+    <div className="container mx-auto">
+      {/* Di masa depan, kita bisa menambahkan sidebar navigasi di sini
+        untuk beralih antara profil, riwayat pesanan, dll.
+      */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <OrderHistoryPage />
+      </div>
     </div>
   );
 };

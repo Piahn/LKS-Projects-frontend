@@ -1,6 +1,13 @@
-import { Link } from "react-router";
-import useCartStore from "../contexts/cartStore";
+import { Link, useNavigate } from "react-router";
 import { FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
+import toast from "react-hot-toast";
+import axiosInstance from "../services/api";
+
+// Custom Hooks
+import useCartStore from "../contexts/cartStore";
+import useAuthStore from "../contexts/authStore";
+
+// Components
 import Button from "../components/ui/Button";
 
 const formatCurrency = (amount) => {
@@ -12,12 +19,40 @@ const formatCurrency = (amount) => {
 };
 
 const CartPage = () => {
-  const { items, removeItem, updateQuantity } = useCartStore();
+  const { items, removeItem, updateQuantity, clearCart } = useCartStore();
+  const { token } = useAuthStore();
+  const navigate = useNavigate();
 
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const handleCheckout = async () => {
+    if (!token) {
+      toast.error("Anda harus login untuk melakukan checkout");
+      navigate("/login");
+      return;
+    }
+
+    const payload = {
+      items: items.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+    };
+
+    try {
+      await axiosInstance.post("/orders", payload);
+      toast.success("Pesanan berhasil di buat!");
+      clearCart(); // bertujuan ketika order berhasil di buat maka keranjangnya di hapus
+      navigate("/orders-success");
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Gagal membuat pesanan.";
+      toast.error(errorMessage);
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -97,7 +132,11 @@ const CartPage = () => {
             <span>Total</span>
             <span>{formatCurrency(subtotal * 1.1)}</span>
           </div>
-          <Button variant="primary" className="w-full mt-6">
+          <Button
+            variant="primary"
+            className="w-full mt-6"
+            onClick={handleCheckout}
+          >
             Lanjutkan ke Checkout
           </Button>
         </div>
