@@ -28,6 +28,11 @@ const AdminOrderPage = () => {
       const response = await axiosInstance.get("/orders");
       setOrders(response.data.data);
     } catch (error) {
+      if (error.status === 404) {
+        return (
+          <p className="text-center">Anda belum memiliki riwayat pesanan.</p>
+        );
+      }
       toast.error("Gagal memuat data pesanan.");
       console.error(error);
     } finally {

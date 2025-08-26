@@ -9,7 +9,7 @@ import useCartStore from "../../contexts/cartStore";
 import Button from "../ui/Button";
 
 const MainLayout = () => {
-  const { token, logout } = useAuthStore();
+  const { token, logout, user } = useAuthStore();
   const { items } = useCartStore();
   const navigate = useNavigate();
 
@@ -21,14 +21,13 @@ const MainLayout = () => {
   };
 
   return (
-    <div>
-      <header className="bg-white shadow-md">
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-white shadow-md sticky top-0 z-10">
         <nav className="container mx-auto px-6 py-3 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-blue-600">
             TokoKita
           </Link>
           <div className="flex items-center space-x-4">
-            {/* Keranjang */}
             <Link
               to="/cart"
               className="relative text-gray-600 hover:text-blue-600"
@@ -43,6 +42,15 @@ const MainLayout = () => {
 
             {token ? (
               <>
+                {/* Tambahkan link ke Admin Panel jika user adalah ADMIN */}
+                {user?.role === "ADMIN" && (
+                  <Link
+                    to="/admin"
+                    className="text-gray-600 hover:text-blue-600 font-semibold"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <Link
                   to="/dashboard"
                   className="text-gray-600 hover:text-blue-600"
@@ -73,11 +81,12 @@ const MainLayout = () => {
         </nav>
       </header>
 
-      <main className="container mx-auto p-8">
+      {/* --- DAN PERUBAHAN DI SINI --- */}
+      <main className="container mx-auto p-8 flex-grow">
         <Outlet />
       </main>
 
-      <footer className="bg-gray-800 text-white p-4 text-center mt-8">
+      <footer className="bg-gray-800 p-4 text-white text-center mt-auto">
         <p>© 2025 TokoKita</p>
       </footer>
     </div>
