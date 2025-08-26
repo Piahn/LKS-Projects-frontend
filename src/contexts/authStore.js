@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { jwtDecode } from "jwt-decode";
 
 const useAuthStore = create(
   persist(
@@ -7,8 +8,12 @@ const useAuthStore = create(
       token: null,
       user: null,
       setToken: (token) => {
-        // untuk decode token, untuk mendapatkan infomasi user
-        set({ token });
+        try {
+          const decodeUser = jwtDecode(token);
+          set({ token, user: decodeUser });
+        } catch (error) {
+          set({ token: null, user: null });
+        }
       },
       logout: () => set({ token: null, user: null }),
     }),

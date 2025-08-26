@@ -9,6 +9,11 @@ import OrderSuccessPage from "./pages/OrderSuccessPage";
 
 // Middleware
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import AdminProductPage from "./pages/admin/AdminProductPage";
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminOrderPage from "./pages/admin/AdminOrderPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +29,7 @@ const router = createBrowserRouter([
         element: <CartPage />,
       },
       {
-        path: "/orders-success",
+        path: "orders-success",
         element: <OrderSuccessPage />,
       },
       {
@@ -46,6 +51,30 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  // RUTE BARU UNTUK ADMIN
+  {
+    path: "/admin",
+    element: <AdminRoute />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <AdminDashboardPage />,
+          },
+          {
+            path: "products",
+            element: <AdminProductPage />,
+          },
+          {
+            path: "orders",
+            element: <AdminOrderPage />,
+          },
+        ],
+      },
+    ],
   },
 ]);
 

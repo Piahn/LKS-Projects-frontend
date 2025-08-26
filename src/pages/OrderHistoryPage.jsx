@@ -24,8 +24,14 @@ const OrderHistoryPage = () => {
     const fetchOrders = async () => {
       try {
         const response = await apiClient.get("/orders");
+
         setOrders(response.data.data);
       } catch (err) {
+        if (err.status === 404) {
+          return (
+            <p className="text-center">Anda belum memiliki riwayat pesanan.</p>
+          );
+        }
         setError("Gagal memuat riwayat pesanan.");
       } finally {
         setLoading(false);
