@@ -27,6 +27,14 @@ const AdminLayout = () => {
             </li>
             <li>
               <Link
+                to="/admin/categories"
+                className="block py-2 px-4 rounded hover:bg-gray-700"
+              >
+                Kategori
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/admin/coupons"
                 className="block py-2 px-4 rounded hover:bg-gray-700"
               >

@@ -15,6 +15,8 @@ import AdminLayout from "./components/layout/AdminLayout";
 import AdminOrderPage from "./pages/admin/AdminOrderPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminCouponPage from "./pages/admin/AdminCouponPage";
+import MyCouponsPage from "./pages/MyCouponsPage";
+import AdminCategoryPage from "./pages/admin/AdminCategoryPage";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +42,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <DashboardPage />,
+          },
+          {
+            path: "my-coupons",
+            element: <MyCouponsPage />,
           },
         ],
       },
@@ -72,6 +78,10 @@ const router = createBrowserRouter([
           {
             path: "orders",
             element: <AdminOrderPage />,
+          },
+          {
+            path: "categories",
+            element: <AdminCategoryPage />,
           },
           {
             path: "coupons",

@@ -49,6 +49,12 @@ const MainLayout = () => {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  to="/dashboard/my-coupons"
+                  className="text-gray-600 hover:text-blue-600"
+                >
+                  Kupon Saya
+                </Link>
                 <Button variant="primary" onClick={handleLogout}>
                   Logout
                 </Button>
