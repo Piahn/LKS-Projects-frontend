@@ -11,6 +11,14 @@ const AdminLayout = () => {
           <ul>
             <li>
               <Link
+                to="/admin"
+                className="block py-2 px-4 rounded hover:bg-gray-700"
+              >
+                Dasbor
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/admin/products"
                 className="block py-2 px-4 rounded hover:bg-gray-700"
               >
