@@ -14,6 +14,7 @@ import AdminProductPage from "./pages/admin/AdminProductPage";
 import AdminLayout from "./components/layout/AdminLayout";
 import AdminOrderPage from "./pages/admin/AdminOrderPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import AdminCouponPage from "./pages/admin/AdminCouponPage";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
           {
             path: "orders",
             element: <AdminOrderPage />,
+          },
+          {
+            path: "coupons",
+            element: <AdminCouponPage />,
           },
         ],
       },

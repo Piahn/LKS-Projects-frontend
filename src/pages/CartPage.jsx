@@ -1,14 +1,16 @@
 import { Link, useNavigate } from "react-router";
-import { FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
+import { FiPlus, FiMinus, FiTrash2, FiTag } from "react-icons/fi";
 import toast from "react-hot-toast";
-import axiosInstance from "../services/api";
+import { useState } from "react";
 
 // Custom Hooks
 import useCartStore from "../contexts/cartStore";
+import axiosInstance from "../services/api";
 import useAuthStore from "../contexts/authStore";
 
 // Components
 import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("id-ID", {
@@ -23,10 +25,52 @@ const CartPage = () => {
   const { token } = useAuthStore();
   const navigate = useNavigate();
 
+  // Logika Coupon
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [discount, setDiscount] = useState(0);
+  const [couponError, setCouponError] = useState("");
+
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+  const tax = subtotal * 0.1;
+  const grandTotal = subtotal + tax - discount;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) {
+      setCouponError("Silakan masukkan kode kupon.");
+      return;
+    }
+    try {
+      // Kita ambil semua kupon milik user untuk validasi
+      const response = await axiosInstance.get("/coupons");
+      const userCoupons = response.data.data;
+      const coupon = userCoupons.find(
+        (c) => c.code.toUpperCase() === couponCode.toUpperCase()
+      );
+
+      if (coupon && coupon.is_active) {
+        let calculatedDiscount = 0;
+        if (coupon.jenis_diskon === "persentase") {
+          calculatedDiscount = subtotal * (coupon.nilai_diskon / 100);
+        } else {
+          calculatedDiscount = coupon.nilai_diskon;
+        }
+        setDiscount(calculatedDiscount);
+        setAppliedCoupon(coupon);
+        setCouponError("");
+        toast.success(`Kupon ${coupon.code} berhasil diterapkan!`);
+      } else {
+        setDiscount(0);
+        setAppliedCoupon(null);
+        setCouponError("Kode kupon tidak valid atau sudah tidak aktif.");
+      }
+    } catch (error) {
+      setCouponError("Gagal memvalidasi kupon.");
+    }
+  };
 
   const handleCheckout = async () => {
     if (!token) {
@@ -40,12 +84,14 @@ const CartPage = () => {
         productId: item.id,
         quantity: item.quantity,
       })),
+      couponCode: appliedCoupon ? appliedCoupon.code : undefined,
     };
 
     try {
       await axiosInstance.post("/orders", payload);
       toast.success("Pesanan berhasil di buat!");
       clearCart(); // bertujuan ketika order berhasil di buat maka keranjangnya di hapus
+      setCouponCode("");
       navigate("/orders-success");
     } catch (error) {
       const errorMessage =
@@ -120,18 +166,50 @@ const CartPage = () => {
 
         <div className="bg-gray-50 p-6 rounded-lg h-fit">
           <h2 className="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
-          <div className="flex justify-between mb-2">
-            <span>Subtotal</span>
-            <span>{formatCurrency(subtotal)}</span>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Kode Kupon</label>
+            <div className="flex">
+              <Input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="Masukkan kode"
+                className="rounded-r-none"
+              />
+              <Button
+                onClick={handleApplyCoupon}
+                variant="secondary"
+                className="rounded-l-none"
+              >
+                Terapkan
+              </Button>
+            </div>
+            {couponError && (
+              <p className="text-red-500 text-sm mt-1">{couponError}</p>
+            )}
           </div>
-          <div className="flex justify-between mb-4">
-            <span>Pajak (10%)</span>
-            <span>{formatCurrency(subtotal * 0.1)}</span>
+
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>{formatCurrency(subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Pajak (10%)</span>
+              <span>{formatCurrency(tax)}</span>
+            </div>
+            {appliedCoupon && (
+              <div className="flex justify-between text-green-600">
+                <span>Diskon ({appliedCoupon.code})</span>
+                <span>- {formatCurrency(discount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between font-bold text-lg border-t pt-4 mt-2">
+              <span>Total</span>
+              <span>{formatCurrency(grandTotal)}</span>
+            </div>
           </div>
-          <div className="flex justify-between font-bold text-lg border-t pt-4">
-            <span>Total</span>
-            <span>{formatCurrency(subtotal * 1.1)}</span>
-          </div>
+
           <Button
             variant="primary"
             className="w-full mt-6"
